@@ -15,7 +15,7 @@ if downloading:
     session = boto3.Session(aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, aws_session_token=aws_session_token)
     s3 = session.resource('s3')
     s34 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, aws_session_token=aws_session_token)
-    my_bucket = s3.Bucket("landsat-classification-results")
+    my_bucket = s3.Bucket("<NAME_OF_S3_BUCKET>")
     classified_imgs = []
     rgb_images = []
     for i,my_bucket_object in enumerate(my_bucket.objects.all()):
