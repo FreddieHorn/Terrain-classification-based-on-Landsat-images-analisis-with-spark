@@ -51,9 +51,9 @@ The normalized difference vegetation index (NDVI) is used to detect forest. When
 Using a specified function, we mark the areas bounded by a certain longitude and latitude, which are ~1° (111 km) in width and height. This guarantees that the classified areas will be clearly visible on the image. Using the client, we connect to the server (https://landsatlook.usgs.gov/stac-server), which, based on a query with information about the area of interest and other parameters, provides a link to the s3 bucket, which contains a .TIF file for each band. 
 We use the ***rasterio*** library to process .TIF files for each of the four bands in the study area. It allows us to obtain a dataset on which we are able to perform operations to classify the four areas. 
 After obtaining the dataset, we reduce the data to a list of tuples, where ***red, green, blue, nir, swir*** are the matrices read from the .TIF files. **bbox** contains a list of ordinates of a given area. 
-``sh
+```sh
 bands_values = [(red, blue, green, nir, swir, bbox),...,...,...].
-``
+```
 ### RDD
 We used RDD (Resilient Distributed Datasets), in order to distribute the computing used on images/matrices operations. Following actions were taken: 
 - operations on the matrices in order to create an image (mask) which marks the classified areas.
@@ -63,22 +63,6 @@ We used RDD (Resilient Distributed Datasets), in order to distribute the computi
 
 We wanted to also use RDD to read .TIF files, which would remarkably increase overall time of the program execution, but it seemed that access to s3 bucket, where the .TIF files were stored, required a session variable, which couldnt be serialized by RDD. 
 We also stumbled upon a problem with saving files with RDD, which was also an access problem.
-
-
-Result image is obtained by putting multiple **rgb** binary masks over the image and assigning a appropriate collor for each of them. Masks are superimposed on an image in an order based on the effectiveness of the terrain classification. Mask corresponding to the least effective classification was imposed first, and the best - last. Said effectiveness was defined based on our observations.
-Terrains sorted by the effectiveness of their classification (from least to best):
-1. desert
-2. urban
-3. forest
-4. water
-Result image can be either dowloaded or be shown in the program.
-Image presented down below is on of the many analised photos in northern Poland. All in all, classification comes down to the pixel analisis so areas like fields without plants or bare ground may be "counted" as a desert. Either way, we think that the classification is correct, and clearly, one can see the relation between "normal" image on the right, and the image with classified terrains.
-![landsat](https://user-images.githubusercontent.com/67193178/190922691-9cb4b7e7-1489-4dae-add5-50a1d545473b.png)
-Sometimes, among the output images, there can be some "unclean" images that eveded filtering. For examle, image of the Niijama island on the Phillipine sea has some black stripes, but the overall black pixel area sums up to less than 10% of the image, so we still consider it an okay image. 
-![Niijama](https://user-images.githubusercontent.com/67193178/190924338-ce215ec1-de20-4c29-9a71-7bee6408a98a.png)
-Another photo of northern Poland (areas of Łeba):
-![łęba](https://user-images.githubusercontent.com/67193178/190925557-4ab68c3d-06ba-4074-b142-1e254fd02a30.png)
-To sum up, we are happy with our current classification system. Nevertheless many areas are assigned to "desert" class when they are de facto not a desert. There are seen as a desert because areas like dry soil or some other types of grounds are no different to a desert for indicators like NDSAI. The system can still be upgraded by experimenting with variables and parameters used in operations on images.
 
 ## Result and data visualisation
 Result image is obtained by putting multiple **rgb** binary masks over the image and assigning a appropriate collor for each of them. Masks are superimposed on an image in an order based on the effectiveness of the terrain classification. Mask corresponding to the least effective classification was imposed first, and the best - last. Said effectiveness was defined based on our observations.
